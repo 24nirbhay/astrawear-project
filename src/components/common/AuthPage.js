@@ -32,10 +32,9 @@ const AuthPage = () => {
   const { login, register, user, loading } = useAuth();
   const navigate = useNavigate();
 
-  // If user becomes available while on this page, redirect immediately
   useEffect(() => {
     if (user && !loading) {
-      navigate('/profile');
+      navigate('/profile', { replace: true });
     }
   }, [user, loading, navigate]);
 
@@ -52,9 +51,10 @@ const AuthPage = () => {
         await register(username, password);
         toast.success('Account created');
       }
-      // Redirect handled by useEffect above
+      navigate('/profile', { replace: true });
     } catch (err) {
-      toast.error(err.message);
+      toast.error(err.message || 'Authentication failed');
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -63,18 +63,18 @@ const AuthPage = () => {
     <Container>
       <Box>
         <h2 style={{ textAlign: 'center', marginBottom: '20px', fontFamily: 'Orbitron' }}>
-          {isLogin ? 'ASTRA LOGIN' : 'JOIN ASTRA'}
+          {isLogin ? 'Welcome Back!' : 'New Here? Create an Account'}
         </h2>
         <form onSubmit={handleAuth}>
           <Input placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} required />
           <Input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required />
-          <Button type="submit" disabled={isSubmitting}>
+          <Button type="submit" disabled={isSubmitting || loading}>
             {isSubmitting ? 'AUTHENTICATING...' : 'PROCEED'}
           </Button>
         </form>
         <p style={{ textAlign: 'center', cursor: 'pointer', marginTop: '20px', color: '#94a3b8' }} 
            onClick={() => !isSubmitting && setIsLogin(!isLogin)}>
-          {isLogin ? "New Operative? Register" : "Existing Operative? Login"}
+          {isLogin ? "New User? Register" : "Existing User? Login"}
         </p>
       </Box>
     </Container>

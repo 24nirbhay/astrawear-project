@@ -10,41 +10,69 @@ export const AuthProvider = ({ children }) => {
 
   const fetchAdminStatus = async (userId) => {
     try {
-      const { data } = await supabase.from('profiles').select('is_admin').eq('id', userId).maybeSingle();
+      const { data, error } = await supabase.from('profiles').select('is_admin').eq('id', userId).maybeSingle();
+      if (error) throw error;
       return !!data?.is_admin;
-    } catch { return false; }
+    } catch (err) { 
+      console.error("Admin check failed:", err);
+      return false; 
+    }
   };
 
   useEffect(() => {
+    let mounted = true;
+
     const initAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        setUser(session.user);
-        const admin = await fetchAdminStatus(session.user.id);
-        setIsAdmin(admin);
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          if (mounted) setUser(session.user);
+          const admin = await fetchAdminStatus(session.user.id);
+          if (mounted) setIsAdmin(admin);
+        }
+      } catch (err) {
+        console.error("Auth init error:", err);
+      } finally {
+        if (mounted) setLoading(false);
       }
-      setLoading(false);
     };
+
     initAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session?.user) {
-        setUser(session.user);
-        const admin = await fetchAdminStatus(session.user.id);
-        setIsAdmin(admin);
-      } else {
-        setUser(null);
-        setIsAdmin(false);
+      try {
+        if (session?.user) {
+          if (mounted) setUser(session.user);
+          const admin = await fetchAdminStatus(session.user.id);
+          if (mounted) setIsAdmin(admin);
+        } else {
+          if (mounted) {
+            setUser(null);
+            setIsAdmin(false);
+          }
+        }
+      } catch (err) {
+        console.error("Auth state change error:", err);
+      } finally {
+        if (mounted) setLoading(false);
       }
-      setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    // Safety timeout: forcefully stop loading if stuck
+    const safetyTimer = setTimeout(() => {
+      if (mounted && loading) setLoading(false);
+    }, 3000);
+
+    return () => {
+      mounted = false;
+      clearTimeout(safetyTimer);
+      subscription?.unsubscribe();
+    };
   }, []);
 
   const login = async (u, p) => {
     const { data, error } = await supabase.auth.signInWithPassword({
-      email: `${u.toLowerCase()}@astrawear.local`,
+      email: `${u.trim().toLowerCase()}@astrawear.local`,
       password: p
     });
     if (error) throw error;
@@ -53,7 +81,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (u, p) => {
     const { data, error } = await supabase.auth.signUp({
-      email: `${u.toLowerCase()}@astrawear.local`,
+      email: `${u.trim().toLowerCase()}@astrawear.local`,
       password: p
     });
     if (error) throw error;
