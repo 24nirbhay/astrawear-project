@@ -34,6 +34,7 @@ const FormGroup = styled.div`
   input {
     width: 100%; padding: 14px; background: rgba(15, 23, 42, 0.6); border: 1px solid #475569;
     border-radius: 8px; color: white; font-family: 'Montserrat', sans-serif;
+    &:disabled { opacity: 0.6; }
   }
 `;
 
@@ -49,7 +50,7 @@ const UserProfilePage = () => {
     const fetchProfile = async () => {
       if (!user) return;
       try {
-        const { data, error } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+        const { data, error } = await supabase.from('profiles').select('*').eq('id', user.id).maybeSingle();
         if (data) {
           setProfile(data);
           setForm({ full_name: data.full_name || '', phone: data.phone || '' });
@@ -92,7 +93,7 @@ const UserProfilePage = () => {
         
         <FormGroup>
           <label>Username</label>
-          <input value={`@${profile.username}`} disabled style={{ opacity: 0.6 }} />
+          <input value={`@${profile.username}`} disabled />
         </FormGroup>
 
         <FormGroup>

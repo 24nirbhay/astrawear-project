@@ -8,33 +8,32 @@ export const AuthProvider = ({ children }) => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const initializeAuth = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        const currentUser = session?.user ?? null;
-        setUser(currentUser);
-        
-        if (currentUser) {
-          const { data, error } = await supabase.from('profiles').select('is_admin').eq('id', currentUser.id).single();
-          if (!error) setIsAdmin(data?.is_admin || false);
-        }
-      } catch (err) {
-        console.error("Auth initialization error:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchAdminStatus = async (userId) => {
+    try {
+      const { data } = await supabase.from('profiles').select('is_admin').eq('id', userId).maybeSingle();
+      return !!data?.is_admin;
+    } catch { return false; }
+  };
 
-    initializeAuth();
+  useEffect(() => {
+    const initAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        setUser(session.user);
+        const admin = await fetchAdminStatus(session.user.id);
+        setIsAdmin(admin);
+      }
+      setLoading(false);
+    };
+    initAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      const currentUser = session?.user ?? null;
-      setUser(currentUser);
-      if (currentUser) {
-        const { data } = await supabase.from('profiles').select('is_admin').eq('id', currentUser.id).single();
-        setIsAdmin(data?.is_admin || false);
+      if (session?.user) {
+        setUser(session.user);
+        const admin = await fetchAdminStatus(session.user.id);
+        setIsAdmin(admin);
       } else {
+        setUser(null);
         setIsAdmin(false);
       }
       setLoading(false);
@@ -43,15 +42,26 @@ export const AuthProvider = ({ children }) => {
     return () => subscription.unsubscribe();
   }, []);
 
+  const login = async (u, p) => {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: `${u.toLowerCase()}@astrawear.local`,
+      password: p
+    });
+    if (error) throw error;
+    return data;
+  };
+
+  const register = async (u, p) => {
+    const { data, error } = await supabase.auth.signUp({
+      email: `${u.toLowerCase()}@astrawear.local`,
+      password: p
+    });
+    if (error) throw error;
+    return data;
+  };
+
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      isAdmin, 
-      loading, 
-      login: (u, p) => supabase.auth.signInWithPassword({ email: `${u.toLowerCase()}@astrawear.local`, password: p }),
-      register: (u, p) => supabase.auth.signUp({ email: `${u.toLowerCase()}@astrawear.local`, password: p }),
-      logout: () => supabase.auth.signOut() 
-    }}>
+    <AuthContext.Provider value={{ user, isAdmin, loading, login, register, logout: () => supabase.auth.signOut() }}>
       {children}
     </AuthContext.Provider>
   );
