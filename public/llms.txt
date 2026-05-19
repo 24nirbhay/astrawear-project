@@ -1,0 +1,36 @@
+AstraWear — LLM guidance for indexing and safe consumption
+
+Site purpose:
+- AstraWear is an e-commerce storefront for apparel and accessories. Primary public content includes product pages, collections, marketing pages, help/FAQ, and blog-style content.
+
+Important pages to index (public, canonical):
+- https://astrawear.vercel.app/                Home — featured products and collections
+- https://astrawear.vercel.app/about/          Company info
+- https://astrawear.vercel.app/collections/    Collections listing
+- https://astrawear.vercel.app/product/:slug   Product detail pages (dynamic)
+- https://astrawear.vercel.app/faq/            FAQ and support
+- https://astrawear.vercel.app/contact-support/ Contact form / support
+- https://astrawear.vercel.app/place-order/    Checkout (do NOT cache sensitive checkout data)
+
+Indexing & crawling guidance:
+- Prefer fully rendered HTML and the canonical URL when present.
+- For product pages capture: title, short description, full description, price, SKU, availability, image URLs, and the canonical product URL.
+- Do not index or store user/account pages (`/user/*`, order history, checkout form data) or any PII (emails, addresses, payment info).
+- Respect `robots.txt` and `sitemap.xml` discovery.
+
+Data handling & privacy:
+- Never attempt to authenticate or access gated resources to extract data.
+- Redact or exclude any PII encountered in user-submitted content before storing or using it.
+
+Snapshot & mirror recommendations:
+- Use clean rendered HTML → convert to Markdown using semantic headings and absolute image URLs.
+- Include page metadata (title, url, lastmod) in frontmatter where possible.
+
+Rate limits & API usage:
+- Use polite crawling rates, obey `robots.txt` rules and the sitemap.
+- Prefer public documented APIs if available and rate-limited; otherwise rely on HTML snapshots.
+
+Contact:
+- If in doubt about what to index, consult `https://astrawear.vercel.app/sitemap.xml`.
+
+Last updated: 2026-05-19

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  AstraWear sitemap and walkthrough
+
+  How to use / maintain:
+  - Replace https://astrawear.vercel.app with your production domain if different.
+  - Add one <url> entry per public, canonical page you want crawlers and indexers to discover.
+  - For dynamic product pages, generate entries programmatically (server-side build or CI) and update `lastmod` when product data changes.
+  - Do NOT include private user/account pages, checkout form POST endpoints, or API keys.
+  - Keep sitemap under ~50k URLs per file and split into sitemap index files if needed.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://astrawear.vercel.app/</loc>
+    <priority>1.00</priority>
+    <changefreq>daily</changefreq>
+    <lastmod>2026-05-19</lastmod>
+  </url>
+  <url>
+    <loc>https://astrawear.vercel.app/about/</loc>
+    <priority>0.50</priority>
+    <changefreq>monthly</changefreq>
+    <lastmod>2026-05-19</lastmod>
+  </url>
+  <url>
+    <loc>https://astrawear.vercel.app/collections/</loc>
+    <priority>0.80</priority>
+    <changefreq>daily</changefreq>
+    <lastmod>2026-05-19</lastmod>
+  </url>
+  <url>
+    <loc>https://astrawear.vercel.app/faq/</loc>
+    <priority>0.40</priority>
+    <changefreq>monthly</changefreq>
+    <lastmod>2026-05-19</lastmod>
+  </url>
+  <url>
+    <loc>https://astrawear.vercel.app/contact-support/</loc>
+    <priority>0.30</priority>
+    <changefreq>monthly</changefreq>
+    <lastmod>2026-05-19</lastmod>
+  </url>
+  <url>
+    <loc>https://astrawear.vercel.app/place-order/</loc>
+    <priority>0.60</priority>
+    <changefreq>weekly</changefreq>
+    <lastmod>2026-05-19</lastmod>
+  </url>
+  <!-- Example product entry; generate one per product in CI/build -->
+  <url>
+    <loc>https://astrawear.vercel.app/product/example-slug/</loc>
+    <priority>0.90</priority>
+    <changefreq>weekly</changefreq>
+    <lastmod>2026-05-19</lastmod>
+  </url>
+</urlset>

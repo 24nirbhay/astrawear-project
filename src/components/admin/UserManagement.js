@@ -35,7 +35,7 @@ const UserManagement = () => {
                 <td>@{user.username || 'user'}</td>
                 <td>{user.full_name || 'N/A'}</td>
                 <td>{user.phone || 'N/A'}</td>
-                <td>{user.role === 'admin' ? 'Admin' : 'User'}</td>
+                <td>{user.is_admin ? 'Admin' : 'User'}</td>
                 <td>
                   <button>View Profile</button>
                   <button>Suspend</button>

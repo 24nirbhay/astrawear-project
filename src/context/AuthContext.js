@@ -13,8 +13,8 @@ export const AuthProvider = ({ children }) => {
       setIsAdmin(false);
       return;
     }
-    const { data } = await supabase.from('profiles').select('role').eq('id', currentUser.id).maybeSingle();
-    setIsAdmin(data?.role === 'admin');
+    const { data } = await supabase.from('profiles').select('is_admin').eq('id', currentUser.id).maybeSingle();
+    setIsAdmin(data?.is_admin === true);
   };
 
   useEffect(() => {
@@ -64,6 +64,7 @@ export const AuthProvider = ({ children }) => {
     // Direct backend call
     await supabase.auth.signOut();
     setUser(null);
+    setIsAdmin(false);
   };
 
   return (
