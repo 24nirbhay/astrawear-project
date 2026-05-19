@@ -25,6 +25,7 @@ import Collections from './components/pages/Collections';
 import PlaceOrder from './components/pages/PlaceOrder';
 import DeliveryAddressPage from './components/pages/DeliveryAddressPage';
 import { Toaster } from 'react-hot-toast';
+import { Analytics } from '@vercel/analytics/react';
 
 const ProtectedRoute = ({ children, adminOnly = false }) => {
   const { user, isAdmin, loading } = useAuth();
@@ -95,6 +96,7 @@ const App = () => {
           </Router>
         </CartProvider>
       </AuthProvider>
+      <Analytics />
     </SiteSettingsProvider>
   );
 };
