@@ -176,12 +176,12 @@ const ProductDetailsPage = () => {
         </Swiper>
       </CarouselWrapper>
       <MainContent>
-        <Price>?{product.price}</Price>
+        <Price>â‚¹{product.price}</Price>
         <ProductName>{product.name}</ProductName>
         <InfoTags>
-          <Pill>Size • {product.size}</Pill>
-          <Pill>Brand • {product.brand}</Pill>
-          <Pill>Category • {product.category}</Pill>
+          <Pill>Size â€¢ {product.size}</Pill>
+          <Pill>Brand â€¢ {product.brand}</Pill>
+          <Pill>Category â€¢ {product.category}</Pill>
         </InfoTags>
         <Buybutton onClick={handleBuyNow}>
           {isReserving ? 'Reserving...' : 'Buy Now'}

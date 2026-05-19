@@ -3,6 +3,9 @@ import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import ProductManagement from './ProductManagement';
 import OrderManagement from './OrderManagement';
+import DashboardHome from './DashboardHome';
+import TicketManagement from './TicketManagement';
+import UserManagement from './UserManagement';
 
 const DashboardContainer = styled.div`
   display: flex;
@@ -49,18 +52,17 @@ const AdminDashboard = () => {
         <NavItem to="/admin" active={location.pathname === '/admin'}>Overview</NavItem>
         <NavItem to="/admin/products" active={location.pathname.includes('/products')}>Manage Drops</NavItem>
         <NavItem to="/admin/orders" active={location.pathname.includes('/orders')}>UPI Verifications</NavItem>
+        <NavItem to="/admin/tickets" active={location.pathname.includes('/tickets')}>Support Tickets</NavItem>
+        <NavItem to="/admin/users" active={location.pathname.includes('/users')}>Users</NavItem>
       </Sidebar>
 
       <Content>
         <Routes>
-          <Route path="/" element={
-            <div style={{ background: '#1e293b', padding: '30px', borderRadius: '12px' }}>
-              <h2>Welcome to the Engine Room</h2>
-              <p style={{ color: '#94a3b8' }}>Use the sidebar to upload new drops or verify pending UPI payments.</p>
-            </div>
-          } />
+          <Route path="/" element={<DashboardHome />} />
           <Route path="/products" element={<ProductManagement />} />
           <Route path="/orders" element={<OrderManagement />} />
+          <Route path="/tickets" element={<TicketManagement />} />
+          <Route path="/users" element={<UserManagement />} />
         </Routes>
       </Content>
     </DashboardContainer>

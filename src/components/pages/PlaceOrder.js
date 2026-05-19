@@ -160,7 +160,7 @@ const PlaceOrder = () => {
         
         <div style={{ textAlign: 'center' }}>
           <h4 style={{ margin: '0 0 5px 0' }}>{product.name}</h4>
-          <div style={{ fontSize: '1.5rem', color: '#5ebdd5ff', fontWeight: 'bold' }}>?{product.price}</div>
+          <div style={{ fontSize: '1.5rem', color: '#5ebdd5ff', fontWeight: 'bold' }}>₹{product.price}</div>
         </div>
 
         <div style={{ textAlign: 'center', background: '#0f172a', padding: '15px', borderRadius: '8px' }}>

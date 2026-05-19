@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { getAllOrdersForAdmin, updateOrderStatus } from '../../services/ordersService';
+import { getAllOrdersForAdmin, updateOrderStatus } from './ordersService';
 import toast from 'react-hot-toast';
 
 const Container = styled.div`
@@ -86,7 +86,7 @@ const OrderManagement = () => {
               <td>@{order.profiles?.username}</td>
               <td>{order.products?.name}</td>
               <td style={{ fontFamily: 'monospace', color: '#5ebdd5ff' }}>{order.upi_transaction_id}</td>
-              <td>?{order.total_price}</td>
+              <td>₹{order.total_price}</td>
               <td>
                 <Select 
                   value={order.status} 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useAuth } from '../../hooks/useAuth';
-import { getUserOrders } from '../../services/ordersService';
+import { getUserOrders } from '../admin/ordersService';
 import { Link } from 'react-router-dom';
 import { FaArrowLeft } from 'react-icons/fa6';
 import toast from 'react-hot-toast';
@@ -71,7 +71,7 @@ const OrderHistoryPage = () => {
               <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.9rem' }}>
                 Order ID: {order.id.split('-')[0]}<br/>
                 UPI TXN: {order.upi_transaction_id}<br/>
-                Total: ?{order.total_price}
+                Total: ₹{order.total_price}
               </p>
             </div>
             <div style={{ textAlign: 'right' }}>

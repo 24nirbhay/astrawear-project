@@ -163,7 +163,7 @@ const ProductManagement = () => {
         <FormBox onSubmit={handleAddProduct}>
           <Input type="file" accept="image/*" onChange={(e) => setFile(e.target.files[0])} />
           <Input name="name" placeholder="Product Name" value={formData.name} onChange={handleChange} required />
-          <Input name="price" type="number" placeholder="Price (?)" value={formData.price} onChange={handleChange} required />
+          <Input name="price" type="number" placeholder="Price (₹)" value={formData.price} onChange={handleChange} required />
           <Select name="category" value={formData.category} onChange={handleChange}>
             <option value="Streetwear">Streetwear</option>
             <option value="Vintage">Vintage Thrift</option>
@@ -202,7 +202,7 @@ const ProductManagement = () => {
               <tr key={p.id}>
                 <td><ProductImage src={p.images[0] || '/favicon.png'} alt={p.name} /></td>
                 <td>{p.name}</td>
-                <td>?{p.price}</td>
+                <td>₹{p.price}</td>
                 <td style={{ color: p.stock <= 0 ? '#ff4d4d' : '#16a34a' }}>
                   {p.stock > 0 ? p.stock : 'Sold Out'}
                 </td>

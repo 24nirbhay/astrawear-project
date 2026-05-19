@@ -1,9 +1,23 @@
-
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { supabase } from '../../config/supabaseClient';
 import './AdminDashboard.css';
 import { FaChartBar, FaBoxOpen, FaUsers } from 'react-icons/fa';
 
-const DashboardHome = ({ products }) => {
+const DashboardHome = () => {
+  const [stats, setStats] = useState({ products: 0, users: 0 });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      const { count: productsCount } = await supabase.from('products').select('*', { count: 'exact', head: true });
+      const { count: usersCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true });
+      setStats({
+        products: productsCount || 0,
+        users: usersCount || 0
+      });
+    };
+    fetchStats();
+  }, []);
+
   return (
     <div className="dashboard-home">
       <h2 className="dashboard-title">Admin Dashboard</h2>
@@ -23,7 +37,7 @@ const DashboardHome = ({ products }) => {
           </div>
           <div className="widget-info">
             <h3>Total Products</h3>
-            <p>{products.length}</p>
+            <p>{stats.products}</p>
           </div>
         </div>
         <div className="widget">
@@ -32,7 +46,7 @@ const DashboardHome = ({ products }) => {
           </div>
           <div className="widget-info">
             <h3>New Users</h3>
-            <p>30</p>
+            <p>{stats.users}</p>
           </div>
         </div>
       </div>

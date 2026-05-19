@@ -67,7 +67,7 @@ const ProductCard = ({ product }) => {
             {isSoldOut ? <s>{product.name}</s> : product.name}
           </ProductName>
           <ProductPrice>
-            {isSoldOut ? <s>?{product.price}</s> : `?${product.price}`}
+            {isSoldOut ? <s>₹{product.price}</s> : `₹${product.price}`}
           </ProductPrice>
         </ProductInfo>
       </Link>

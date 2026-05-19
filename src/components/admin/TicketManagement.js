@@ -1,28 +1,30 @@
 import React, { useEffect, useState } from 'react';
+import { supabase } from '../../config/supabaseClient';
+import toast from 'react-hot-toast';
 
 const TicketManagement = () => {
   const [tickets, setTickets] = useState([]);
   const [filter, setFilter] = useState('All');
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem('supportTickets');
-      const list = raw ? JSON.parse(raw) : [];
-      setTickets(list);
-    } catch {
-      setTickets([]);
-    }
+    const fetchTickets = async () => {
+      const { data, error } = await supabase.from('tickets').select('*').order('created_at', { ascending: false });
+      if (!error && data) setTickets(data);
+    };
+    fetchTickets();
   }, []);
 
-  const updateTicketStatus = (id, status) => {
+  const updateTicketStatus = async (id, status) => {
+    const { error } = await supabase.from('tickets').update({ status }).eq('id', id);
+    if (error) return toast.error('Failed to update status');
+    toast.success(`Ticket marked as ${status}`);
     setTickets(prev => {
       const updated = prev.map(t => t.id === id ? { ...t, status } : t);
-      localStorage.setItem('supportTickets', JSON.stringify(updated));
       return updated;
     });
   };
 
-  const filtered = tickets.filter(t => filter === 'All' || t.status === filter);
+  const filtered = tickets.filter(t => filter === 'All' || (t.status || 'Open') === filter);
 
   return (
     <div style={{
@@ -49,14 +51,14 @@ const TicketManagement = () => {
           <li key={t.id} style={{background:'#334155',padding:'14px 16px',borderRadius:'10px',display:'flex',flexDirection:'column',gap:'8px'}}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
               <strong style={{fontSize:'0.9rem'}}>{t.id}</strong>
-              <span style={{fontSize:'0.7rem',background:'#475569',padding:'4px 8px',borderRadius:'6px'}}>{t.status}</span>
+              <span style={{fontSize:'0.7rem',background:'#475569',padding:'4px 8px',borderRadius:'6px'}}>{t.status || 'Open'}</span>
             </div>
             <div style={{fontSize:'0.8rem',color:'#cbd5e1'}}>
               <div><strong>Name:</strong> {t.name}</div>
               <div><strong>Phone:</strong> {t.phone}</div>
-              {t.userId && <div><strong>User ID:</strong> {t.userId}</div>}
+              {t.user_id && <div><strong>User ID:</strong> {t.user_id}</div>}
               <div style={{marginTop:'6px'}}><strong>Query:</strong> {t.query}</div>
-              <div style={{marginTop:'4px',fontSize:'0.65rem',opacity:0.7}}>Created: {new Date(t.createdAt).toLocaleString()}</div>
+              <div style={{marginTop:'4px',fontSize:'0.65rem',opacity:0.7}}>Created: {new Date(t.created_at).toLocaleString()}</div>
             </div>
             <div style={{display:'flex',gap:'8px',flexWrap:'wrap'}}>
               {['Open','In Progress','Closed'].map(st => (

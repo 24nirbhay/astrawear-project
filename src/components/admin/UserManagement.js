@@ -1,13 +1,19 @@
-
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { supabase } from '../../config/supabaseClient';
 import './AdminDashboard.css';
 
 const UserManagement = () => {
-  // Placeholder data
-  const users = [
-    { id: 1, name: 'John Doe', email: 'john.doe@example.com', orders: 5 },
-    { id: 2, name: 'Jane Smith', email: 'jane.smith@example.com', orders: 2 },
-  ];
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const { data, error } = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
+      if (!error && data) {
+        setUsers(data);
+      }
+    };
+    fetchUsers();
+  }, []);
 
   return (
     <div>
@@ -16,20 +22,20 @@ const UserManagement = () => {
         <table>
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Orders</th>
+              <th>Username</th>
+              <th>Full Name</th>
+              <th>Phone</th>
+              <th>Role</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             {users.map(user => (
               <tr key={user.id}>
-                <td>{user.id}</td>
-                <td>{user.name}</td>
-                <td>{user.email}</td>
-                <td>{user.orders}</td>
+                <td>@{user.username || 'user'}</td>
+                <td>{user.full_name || 'N/A'}</td>
+                <td>{user.phone || 'N/A'}</td>
+                <td>{user.role === 'admin' ? 'Admin' : 'User'}</td>
                 <td>
                   <button>View Profile</button>
                   <button>Suspend</button>

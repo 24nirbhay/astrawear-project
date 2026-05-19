@@ -19,8 +19,6 @@ const Spacebutton = () => {
 }
 
 const StyledWrapper = styled.div`
-  @import url("s://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&display=swap");
-
   .btn {
     display: flex;
     justify-content: center;

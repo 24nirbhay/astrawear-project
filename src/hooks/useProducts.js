@@ -2,7 +2,7 @@
 // TODO: Replace with React Query or SWR for better caching and state management
 
 import { useState, useEffect } from 'react';
-import { getProducts, getProductById } from '../services/productsService';
+import { getProducts, getProductById } from '../components/admin/productsService';
 
 export const useProducts = () => {
   const [products, setProducts] = useState([]);

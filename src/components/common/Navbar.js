@@ -89,7 +89,7 @@ const itemVariants = {
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { user, logout } = useAuth();
+  const { user, isAdmin, logout, loading } = useAuth();
 
   const handleLogout = () => {
     setIsOpen(false);
@@ -120,12 +120,14 @@ const Navbar = () => {
               <NavItem variants={itemVariants} onClick={() => setIsOpen(false)}>
                 <Link to="/collections">Collections</Link>
               </NavItem>
-              {user?.isAdmin && (
+              {isAdmin && (
                 <NavItem variants={itemVariants} onClick={() => setIsOpen(false)}>
                   <Link to="/admin">Admin</Link>
                 </NavItem>
               )}
-              {user ? (
+            {loading ? (
+              <NavItem variants={itemVariants}><span style={{fontSize: '1rem', color: '#94a3b8', padding: '10px'}}>...</span></NavItem>
+            ) : user ? (
                 <>
                   <NavItem variants={itemVariants} onClick={() => setIsOpen(false)}>
                     <Link to="/profile">User Profile</Link>
