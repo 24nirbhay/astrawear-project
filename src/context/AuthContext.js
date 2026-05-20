@@ -9,17 +9,35 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   const checkAdminStatus = async (currentUser) => {
+    console.log('[AuthContext] checkAdminStatus triggered for user:', currentUser?.id);
     if (!currentUser) {
+      console.log('[AuthContext] No user found, setting isAdmin to false');
       setIsAdmin(false);
       return;
     }
-    const { data } = await supabase.from('profiles').select('is_admin').eq('id', currentUser.id).maybeSingle();
-    setIsAdmin(data?.is_admin === true);
+    
+    try {
+      console.log('[AuthContext] Fetching profile for is_admin flag...');
+      const { data, error } = await supabase.from('profiles').select('is_admin').eq('id', currentUser.id).maybeSingle();
+      
+      if (error) console.error('[AuthContext] DB Error fetching profile:', error);
+      else console.log('[AuthContext] Profile data retrieved:', data);
+      
+      setIsAdmin(data?.is_admin === true);
+    } catch (err) {
+      console.error('[AuthContext] Exception in checkAdminStatus:', err);
+      setIsAdmin(false);
+    }
   };
 
   useEffect(() => {
+    console.log('[AuthContext] Mounting AuthProvider. Checking initial session...');
+    
     // 1. Get current session directly from the DB on load
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      if (error) console.error('[AuthContext] Error in getSession():', error);
+      console.log('[AuthContext] Initial getSession() result:', session);
+      
       const currentUser = session?.user ?? null;
       setUser(currentUser);
       checkAdminStatus(currentUser).finally(() => setLoading(false));
@@ -27,12 +45,16 @@ export const AuthProvider = ({ children }) => {
 
     // 2. Listen for login/logout events directly from the DB
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log(`[AuthContext] onAuthStateChange Fired! Event: ${_event}`, session);
       const currentUser = session?.user ?? null;
       setUser(currentUser);
       checkAdminStatus(currentUser);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      console.log('[AuthContext] Unmounting AuthProvider, cleaning up subscription.');
+      subscription.unsubscribe();
+    };
   }, []);
 
   const login = async (email, password) => {
@@ -43,19 +65,37 @@ export const AuthProvider = ({ children }) => {
   };
 
   const signInWithGoogle = async () => {
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/`
+    console.log('[AuthContext] Initiating Google OAuth Sign In...');
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/`
+        }
+      });
+      if (error) {
+        console.error('[AuthContext] Error from signInWithOAuth:', error);
+        throw error;
       }
-    });
-    if (error) throw error;
-    return data;
+      console.log('[AuthContext] signInWithOAuth initiated successfully:', data);
+      return data;
+    } catch (err) {
+      console.error('[AuthContext] Exception during signInWithGoogle:', err);
+      throw err;
+    }
   };
 
   const register = async (email, password) => {
     // Direct backend call
-    const { data, error } = await supabase.auth.signUp({ email, password });
+    const { data, error } = await supabase.auth.signUp({ 
+      email, 
+      password,
+      options: {
+        data: {
+          full_name: email.split('@')[0] // Safely defaults to the first part of their email
+        }
+      }
+    });
     if (error) throw error;
     return data;
   };
