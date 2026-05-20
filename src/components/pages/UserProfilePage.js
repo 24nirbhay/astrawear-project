@@ -230,7 +230,7 @@ const UserProfilePage = () => {
 
       // Use UPSERT with all fields to prevent NOT NULL constraints and fix missing profiles
       const fallbackUsername = user?.email?.split('@')[0] || `user${Math.floor(Math.random() * 1000)}`;
-      const { error: updateError } = await supabase
+      const { data: updatedProfile, error: updateError } = await supabase
         .from('profiles')
         .upsert({ 
           id: user.id,
@@ -238,13 +238,22 @@ const UserProfilePage = () => {
           username: profile.username || fallbackUsername,
           full_name: profile.full_name || null,
           phone: profile.phone || null
-        });
+        })
+        .select('*')
+        .single();
 
       if (updateError) {
         throw new Error(updateError.message || 'Database update failed');
       }
 
-      setProfile({ ...profile, avatar_url: data.publicUrl });
+      setProfile(updatedProfile || { ...profile, avatar_url: data.publicUrl });
+      if (updatedProfile) {
+        setForm({
+          full_name: updatedProfile.full_name || '',
+          phone: updatedProfile.phone || '',
+          username: updatedProfile.username || ''
+        });
+      }
       toast.success('Profile picture updated!');
     } catch (error) {
       console.error(error);
@@ -258,17 +267,26 @@ const UserProfilePage = () => {
     try {
       // Use UPSERT to support older users whose profiles might not exist yet
       const fallbackUsername = user?.email?.split('@')[0] || `user${Math.floor(Math.random() * 1000)}`;
-      const { error } = await supabase.from('profiles').upsert({ 
+      const { data: updatedProfile, error } = await supabase.from('profiles').upsert({ 
         id: user.id,
         full_name: form.full_name,
         phone: form.phone,
         username: form.username || fallbackUsername,
         avatar_url: profile.avatar_url || null
-      });
+      })
+      .select('*')
+      .single();
       
       if (error) throw new Error(error.message);
       
-      setProfile({ ...profile, ...form });
+      setProfile(updatedProfile || { ...profile, ...form });
+      if (updatedProfile) {
+        setForm({
+          full_name: updatedProfile.full_name || '',
+          phone: updatedProfile.phone || '',
+          username: updatedProfile.username || ''
+        });
+      }
       setIsEditing(false);
       toast.success('Profile saved successfully');
     } catch (err) {
