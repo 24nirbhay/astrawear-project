@@ -78,6 +78,15 @@ const Button = styled.button`
   &:disabled { opacity: 0.5; cursor: not-allowed; }
 `;
 
+const CancelButton = styled(Button)`
+  background: #334155;
+  &:hover {
+    background: #475569;
+    filter: none;
+  }
+`;
+
+
 const PlaceOrder = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -185,9 +194,14 @@ const PlaceOrder = () => {
           onChange={(e) => setTransactionId(e.target.value)}
         />
 
-        <Button onClick={handleConfirmOrder} disabled={isSubmitting || timeLeft <= 0}>
-          {isSubmitting ? 'Verifying...' : 'Confirm Order'}
-        </Button>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '10px' }}>
+          <Button onClick={handleConfirmOrder} disabled={isSubmitting || timeLeft <= 0}>
+            {isSubmitting ? 'Verifying...' : 'Confirm Order'}
+          </Button>
+          <CancelButton onClick={() => navigate(`/product/${product.id}`)} disabled={isSubmitting}>
+            Cancel
+          </CancelButton>
+        </div>
       </OrderForm>
     </PageContainer>
   );

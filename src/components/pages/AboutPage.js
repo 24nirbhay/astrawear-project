@@ -3,19 +3,20 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 
 const PageContainer = styled.div`
-  padding: 24px 2vw 32px;
+  padding: 100px 2rem 5rem 2rem;
   background-color: #121212;
   min-height: 100vh;
   color: #fff;
-  text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
   @media (max-width: 900px) {
-    padding: 16px 1vw 20px;
+    padding: 90px 1.5rem 3rem 1.5rem;
   }
   @media (max-width: 600px) {
-    padding: 8px 0.5vw 10px;
+    padding: 80px 1rem 2rem 1rem;
   }
 `;
 
@@ -23,6 +24,7 @@ const Title = styled.h1`
   font-family: 'Honk', sans-serif;
   font-size: 3.2rem;
   margin-bottom: 1.5rem;
+  text-align: center;
   color: #ffcc00;
   @media (max-width: 600px) {
     font-size: 2rem;
@@ -35,6 +37,7 @@ const Subtitle = styled.p`
   max-width: 700px;
   margin: 0 auto 3rem;
   font-size: 1.1rem;
+  text-align: center;
   line-height: 1.6;
   opacity: 0.85;
 `;
@@ -95,6 +98,7 @@ const Name = styled.h2`
   font-family: 'Orbitron', sans-serif;
   font-size: 1.5rem;
   margin-bottom: 0.5rem;
+  text-align: center;
 `;
 
 const Role = styled.p`
@@ -102,20 +106,20 @@ const Role = styled.p`
   font-size: 1rem;
   opacity: 0.7;
   margin-bottom: 1rem;
+  text-align: center;
 `;
 
 const Bio = styled.p`
   font-size: 0.95rem;
   line-height: 1.5;
   opacity: 0.85;
+  text-align: center;
 `;
 
 const BrandSection = styled.div`
   margin-bottom: 4rem;
   width: 100%;
   max-width: 900px;
-  margin-left: auto;
-  margin-right: auto;
   @media (max-width: 900px) {
     max-width: 98vw;
   }
@@ -125,6 +129,7 @@ const BrandTitle = styled.h2`
   font-family: 'Honk', sans-serif;
   font-size: 2.5rem;
   margin-bottom: 1rem;
+  text-align: center;
   color: #ffcc00;
 `;
 
@@ -132,9 +137,10 @@ const BrandText = styled.p`
   font-family: 'Montserrat', sans-serif;
   max-width: 750px;
   margin: 0 auto;
-  font-size: 1.05rem;
-  line-height: 1.7;
-  opacity: 0.85;
+  font-size: 1.15rem;
+  line-height: 1.8;
+  opacity: 0.9;
+  text-align: center;
 `;
 
 const AboutPage = () => {

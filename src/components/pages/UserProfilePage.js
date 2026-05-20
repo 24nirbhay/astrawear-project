@@ -175,7 +175,7 @@ const UserProfilePage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [profile, setProfile] = useState({ full_name: '', phone: '', username: '', avatar_url: '' });
-  const [form, setForm] = useState({ full_name: '', phone: '' });
+  const [form, setForm] = useState({ full_name: '', phone: '', username: '' });
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -190,7 +190,7 @@ const UserProfilePage = () => {
         if (error) throw error;
         if (data) {
           setProfile(data);
-          setForm({ full_name: data.full_name || '', phone: data.phone || '' });
+          setForm({ full_name: data.full_name || '', phone: data.phone || '', username: data.username || '' });
         }
       } catch (err) {
         console.error("Profile fetch error:", err);
@@ -242,7 +242,8 @@ const UserProfilePage = () => {
       const { error } = await supabase.from('profiles').upsert({ 
         id: user.id, 
         full_name: form.full_name,
-        phone: form.phone
+        phone: form.phone,
+        username: form.username,
       });
       
       if (error) throw new Error(error.message);
@@ -317,7 +318,13 @@ const UserProfilePage = () => {
 
         <FormGroup>
           <label>Username</label>
-          <input value={`@${profile.username || user?.email?.split('@')[0] || 'user'}`} disabled />
+          <input 
+            value={isEditing ? form.username : `@${profile.username || ''}`} 
+            onChange={e => setForm({...form, username: e.target.value.replace(/[^a-z0-9_]/gi, '')})}
+            disabled={!isEditing} 
+            placeholder="Enter a unique username"
+          />
+          {isEditing && <small style={{color: '#94a3b8', marginTop: '5px', display: 'block'}}>Usernames can only contain letters, numbers, and underscores.</small>}
         </FormGroup>
 
         <FormGroup>

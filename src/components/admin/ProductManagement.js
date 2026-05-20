@@ -75,8 +75,9 @@ const ProductManagement = () => {
   const [products, setProducts] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const [file, setFile] = useState(null);
+  const [editingProduct, setEditingProduct] = useState(null);
   
-  const [formData, setFormData] = useState({
+  const initialFormState = {
     name: '',
     price: '',
     description: '',
@@ -84,7 +85,9 @@ const ProductManagement = () => {
     brand: 'Astrawear',
     size: 'M',
     stock: 1
-  });
+  };
+
+  const [formData, setFormData] = useState(initialFormState);
 
   const fetchProducts = async () => {
     const { data, error } = await supabase.from('products').select('*').order('created_at', { ascending: false });
@@ -97,50 +100,80 @@ const ProductManagement = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleAddProduct = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!file) return toast.error('Please upload an image for the product.');
+    if (!editingProduct && !file) return toast.error('Please upload an image for a new product.');
     if (!formData.name || !formData.price) return toast.error('Name and Price are required.');
 
     setIsUploading(true);
-    let imageUrl = '';
+    let imageUrl = editingProduct?.images[0] || '';
 
     try {
-      // 1. Upload Image to Supabase Storage
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
-      const { error: uploadError } = await supabase.storage.from('product-images').upload(fileName, file);
-      
-      if (uploadError) throw uploadError;
+      if (file) {
+        // 1. Upload Image to Supabase Storage
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Math.random()}.${fileExt}`;
+        const { error: uploadError } = await supabase.storage.from('product-images').upload(fileName, file);
+        
+        if (uploadError) throw uploadError;
 
-      // 2. Get Public URL
-      const { data: { publicUrl } } = supabase.storage.from('product-images').getPublicUrl(fileName);
-      imageUrl = publicUrl;
+        // 2. Get Public URL
+        const { data: { publicUrl } } = supabase.storage.from('product-images').getPublicUrl(fileName);
+        imageUrl = publicUrl;
+      }
 
-      // 3. Insert Product into Database
-      const { error: dbError } = await supabase.from('products').insert([{
-        name: formData.name,
-        price: parseFloat(formData.price),
-        description: formData.description,
-        category: formData.category,
-        brand: formData.brand,
-        size: formData.size,
-        stock: parseInt(formData.stock),
-        images: [imageUrl]
-      }]);
+      const productData = {
+          name: formData.name,
+          price: parseFloat(formData.price),
+          description: formData.description,
+          category: formData.category,
+          brand: formData.brand,
+          size: formData.size,
+          stock: parseInt(formData.stock),
+          images: [imageUrl]
+      };
 
-      if (dbError) throw dbError;
+      if (editingProduct) {
+        // Update existing product
+        const { error } = await supabase.from('products').update(productData).eq('id', editingProduct.id);
+        if (error) throw error;
+        toast.success('Product updated successfully!');
+      } else {
+        // Insert new product
+        const { error } = await supabase.from('products').insert([productData]);
+        if (error) throw error;
+        toast.success('Product added successfully!');
+      }
 
-      toast.success('Product added successfully!');
-      setFormData({ name: '', price: '', description: '', category: 'Streetwear', brand: 'Astrawear', size: 'M', stock: 1 });
-      setFile(null);
+      handleCancelEdit();
       fetchProducts(); // Refresh list
 
     } catch (error) {
-      toast.error(error.message || 'Failed to add product');
+      toast.error(error.message || `Failed to ${editingProduct ? 'update' : 'add'} product`);
     } finally {
       setIsUploading(false);
     }
+  };
+
+  const handleEdit = (product) => {
+    setEditingProduct(product);
+    setFormData({
+      name: product.name || '',
+      price: product.price || '',
+      description: product.description || '',
+      category: product.category || 'Streetwear',
+      brand: product.brand || 'Astrawear',
+      size: product.size || 'M',
+      stock: product.stock || 0,
+    });
+    setFile(null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingProduct(null);
+    setFormData(initialFormState);
+    setFile(null);
   };
 
   const handleDelete = async (id) => {
@@ -159,9 +192,9 @@ const ProductManagement = () => {
     <Container>
       {/* Upload Form */}
       <div>
-        <h3 style={{ marginTop: 0 }}>Add New Drop</h3>
-        <FormBox onSubmit={handleAddProduct}>
-          <Input type="file" accept="image/*" onChange={(e) => setFile(e.target.files[0])} />
+        <h3 style={{ marginTop: 0 }}>{editingProduct ? 'Edit Drop' : 'Add New Drop'}</h3>
+        <FormBox onSubmit={handleSubmit}>
+          <Input type="file" accept="image/*" onChange={(e) => setFile(e.target.files[0])} key={file ? 'file-selected' : 'no-file'} />
           <Input name="name" placeholder="Product Name" value={formData.name} onChange={handleChange} required />
           <Input name="price" type="number" placeholder="Price (₹)" value={formData.price} onChange={handleChange} required />
           <Select name="category" value={formData.category} onChange={handleChange}>
@@ -178,9 +211,14 @@ const ProductManagement = () => {
             <option value="OS">One Size</option>
           </Select>
           <Input name="stock" type="number" placeholder="Initial Stock" value={formData.stock} onChange={handleChange} min="1" required />
-          <Button type="submit" disabled={isUploading}>
-            {isUploading ? 'Uploading Drop...' : 'Publish Product'}
-          </Button>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            {editingProduct && <Button type="button" onClick={handleCancelEdit} style={{ background: '#475569' }}>Cancel</Button>}
+            <Button type="submit" disabled={isUploading}>
+              {isUploading 
+                ? (editingProduct ? 'Updating...' : 'Uploading...') 
+                : (editingProduct ? 'Update Product' : 'Publish Product')}
+            </Button>
+          </div>
         </FormBox>
       </div>
 
@@ -207,6 +245,12 @@ const ProductManagement = () => {
                   {p.stock > 0 ? p.stock : 'Sold Out'}
                 </td>
                 <td>
+                  <button 
+                    onClick={() => handleEdit(p)}
+                    style={{ background: '#3b82f6', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer', marginRight: '5px' }}
+                  >
+                    Edit
+                  </button>
                   <button 
                     onClick={() => handleDelete(p.id)}
                     style={{ background: '#ef4444', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer' }}
