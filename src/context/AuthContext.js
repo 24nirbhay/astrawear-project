@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { supabase } from '../config/supabaseClient';
+import toast from 'react-hot-toast';
 
 export const AuthContext = createContext();
 
@@ -33,6 +34,14 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     console.log('[AuthContext] Mounting AuthProvider. Checking initial session...');
     
+    // 0. Catch silent OAuth errors hidden in the URL before Supabase clears them
+    const urlParams = new URLSearchParams(window.location.search || window.location.hash.replace('#', '?'));
+    const errorDescription = urlParams.get('error_description');
+    if (errorDescription) {
+      console.error('[AuthContext] OAuth Error from URL:', errorDescription);
+      setTimeout(() => toast.error(`Auth Error: ${errorDescription.replace(/\+/g, ' ')}`), 500);
+    }
+
     // 1. Get current session directly from the DB on load
     supabase.auth.getSession().then(({ data: { session }, error }) => {
       if (error) console.error('[AuthContext] Error in getSession():', error);
