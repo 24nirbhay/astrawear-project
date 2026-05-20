@@ -33,6 +33,10 @@ const LayoutGrid = styled.div`
     grid-template-columns: 1fr 1fr;
     align-items: start;
   }
+
+  @media (max-width: 600px) {
+    padding: 80px 1rem 3rem 1rem;
+  }
 `;
 
 const ImageColumn = styled.div`

@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { supabase } from '../../config/supabaseClient';
 import { useAuth } from '../../hooks/useAuth';
 import toast from 'react-hot-toast';
+import { FaCheckCircle, FaTimesCircle, FaMapMarkerAlt } from 'react-icons/fa';
 
 const PageContainer = styled.div`
   padding: 80px 2rem;
@@ -13,6 +14,10 @@ const PageContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+
+  @media (max-width: 600px) {
+    padding: 80px 1rem;
+  }
 `;
 
 const OrderForm = styled.div`
@@ -74,6 +79,10 @@ const Button = styled.button`
   font-weight: 600;
   cursor: pointer;
   transition: filter 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   &:hover { filter: brightness(1.1); }
   &:disabled { opacity: 0.5; cursor: not-allowed; }
 `;
@@ -179,7 +188,7 @@ const PlaceOrder = () => {
         </div>
 
         <Select value={selectedAddress} onChange={(e) => setSelectedAddress(e.target.value)}>
-          <option value="" disabled>Select Delivery Address</option>
+          <option value="" disabled>📍 Select Delivery Address</option>
           {addresses.map(addr => (
             <option key={addr.id} value={addr.id}>
               {addr.name} - {addr.line1}, {addr.city}
@@ -196,10 +205,10 @@ const PlaceOrder = () => {
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '10px' }}>
           <Button onClick={handleConfirmOrder} disabled={isSubmitting || timeLeft <= 0}>
-            {isSubmitting ? 'Verifying...' : 'Confirm Order'}
+            {isSubmitting ? 'Verifying...' : <><FaCheckCircle /> Confirm Order</>}
           </Button>
           <CancelButton onClick={() => navigate(`/product/${product.id}`)} disabled={isSubmitting}>
-            Cancel
+            <FaTimesCircle /> Cancel
           </CancelButton>
         </div>
       </OrderForm>

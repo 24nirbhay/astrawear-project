@@ -5,6 +5,7 @@ import { useAuth } from '../../hooks/useAuth';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
 import { FaArrowLeft } from 'react-icons/fa6';
+import { FaPlus, FaSave, FaTrash, FaMapMarkerAlt } from 'react-icons/fa';
 
 const PageContainer = styled.div`
   min-height: 100vh; 
@@ -14,6 +15,10 @@ const PageContainer = styled.div`
   display: flex; 
   justify-content: center; 
   font-family: 'Montserrat', sans-serif;
+
+  @media (max-width: 600px) {
+    padding: 80px 1rem 2rem 1rem;
+  }
 `;
 
 const ContentBox = styled.div`
@@ -52,6 +57,10 @@ const Button = styled.button`
   font-weight: bold; 
   cursor: pointer;
   font-family: 'Montserrat', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 `;
 
 const AddressCard = styled.div`
@@ -118,13 +127,13 @@ const DeliveryAddressPage = () => {
         <Link to="/profile" style={{ color: '#94a3b8', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
           <FaArrowLeft /> Back to Profile
         </Link>
-        <h2 style={{ marginTop: 0, fontFamily: 'Orbitron' }}>My Saved Addresses</h2>
+        <h2 style={{ marginTop: 0, fontFamily: 'Orbitron', display: 'flex', alignItems: 'center', gap: '10px' }}><FaMapMarkerAlt style={{color: '#5ebdd5'}}/> My Saved Addresses</h2>
         
         {addresses.map(addr => (
           <AddressCard key={addr.id}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <h4 style={{ margin: '0 0 5px 0' }}>Shipping Destination</h4>
-              <button onClick={() => handleDelete(addr.id)} style={{ background: 'transparent', color: '#ef4444', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>Delete</button>
+              <button onClick={() => handleDelete(addr.id)} style={{ background: 'transparent', color: '#ef4444', border: 'none', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '5px' }}><FaTrash /> Delete</button>
             </div>
             <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.9rem', lineHeight: '1.4' }}>
               {addr.line1}<br/>
@@ -134,7 +143,7 @@ const DeliveryAddressPage = () => {
         ))}
 
         {!showForm ? (
-          <Button onClick={() => setShowForm(true)} style={{ marginTop: '20px' }}>+ Add New Address</Button>
+          <Button onClick={() => setShowForm(true)} style={{ marginTop: '20px' }}><FaPlus /> Add New Address</Button>
         ) : (
           <form onSubmit={handleAddAddress} style={{ marginTop: '30px' }}>
             <h3 style={{ borderTop: '1px solid #334155', paddingTop: '20px', fontFamily: 'Orbitron' }}>New Address</h3>
@@ -146,7 +155,7 @@ const DeliveryAddressPage = () => {
             <Input placeholder="PIN Code / Postal Code" value={formData.postal_code} onChange={e => setFormData({...formData, postal_code: e.target.value})} required />
             <div style={{ display: 'flex', gap: '10px' }}>
               <Button type="button" onClick={() => setShowForm(false)} style={{ background: '#334155' }}>Cancel</Button>
-              <Button type="submit">Save Address</Button>
+              <Button type="submit"><FaSave /> Save Address</Button>
             </div>
           </form>
         )}

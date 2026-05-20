@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useAuth } from '../../hooks/useAuth';
 import { getUserOrders } from '../admin/ordersService';
 import { Link } from 'react-router-dom';
-import { FaArrowLeft } from 'react-icons/fa6';
+import { FaArrowLeft, FaBoxOpen } from 'react-icons/fa6';
 import toast from 'react-hot-toast';
 
 const PageContainer = styled.div`
@@ -12,6 +12,10 @@ const PageContainer = styled.div`
   background-color: #121212;
   color: white;
   font-family: 'Montserrat', sans-serif;
+
+  @media (max-width: 600px) {
+    padding: 80px 1rem 2rem 1rem;
+  }
 `;
 
 const OrderCard = styled.div`
@@ -59,7 +63,7 @@ const OrderHistoryPage = () => {
       <Link to="/" style={{ color: '#94a3b8', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
         <FaArrowLeft /> Back to Shop
       </Link>
-      <h2 style={{ marginBottom: '30px' }}>My Order History</h2>
+      <h2 style={{ marginBottom: '30px', display: 'flex', alignItems: 'center', gap: '10px' }}><FaBoxOpen style={{color: '#8e7ce8'}}/> My Order History</h2>
       
       {orders.length === 0 ? (
         <p style={{ color: '#94a3b8' }}>You haven't made any purchases yet.</p>

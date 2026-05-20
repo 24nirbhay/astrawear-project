@@ -6,7 +6,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 import { FaMapMarkerAlt, FaCamera } from 'react-icons/fa';
-import { FaArrowLeft, FaShieldHalved, FaBoxOpen, FaPowerOff } from 'react-icons/fa6';
+import { FaArrowLeft, FaShieldHalved, FaBoxOpen, FaPowerOff, FaSave, FaTimes } from 'react-icons/fa6';
 
 const PageContainer = styled.div`
   min-height: 100vh;
@@ -17,6 +17,10 @@ const PageContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: flex-start;
+
+  @media (max-width: 600px) {
+    padding: 80px 1rem 3rem 1rem;
+  }
 `;
 
 const ProfileCard = styled.div`
@@ -122,6 +126,11 @@ const Button = styled.button`
   transition: filter 0.2s;
   flex: 1;
   
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
   &:hover {
     filter: brightness(1.1);
   }
@@ -219,9 +228,11 @@ const UserProfilePage = () => {
 
       const { data } = supabase.storage.from('avatars').getPublicUrl(fileName);
 
+      // Use UPDATE instead of UPSERT to prevent wiping other profile fields
       const { error: updateError } = await supabase
         .from('profiles')
-        .upsert({ id: user.id, avatar_url: data.publicUrl });
+        .update({ avatar_url: data.publicUrl })
+        .eq('id', user.id);
 
       if (updateError) {
         throw new Error(updateError.message || 'Database update failed');
@@ -239,12 +250,12 @@ const UserProfilePage = () => {
 
   const handleSave = async () => {
     try {
-      const { error } = await supabase.from('profiles').upsert({ 
-        id: user.id, 
+      // Use UPDATE instead of UPSERT to prevent wiping other profile fields
+      const { error } = await supabase.from('profiles').update({ 
         full_name: form.full_name,
         phone: form.phone,
         username: form.username,
-      });
+      }).eq('id', user.id);
       
       if (error) throw new Error(error.message);
       
@@ -350,8 +361,8 @@ const UserProfilePage = () => {
         <div style={{ display: 'flex', gap: '15px', marginTop: '2rem' }}>
           {isEditing ? (
             <>
-              <Button onClick={handleSave}>Save Changes</Button>
-              <OutlineButton onClick={() => setIsEditing(false)}>Cancel</OutlineButton>
+              <Button onClick={handleSave}><FaSave /> Save Changes</Button>
+              <OutlineButton onClick={() => setIsEditing(false)}><FaTimes /> Cancel</OutlineButton>
             </>
           ) : (
             <OutlineButton onClick={() => setIsEditing(true)}>Edit Profile</OutlineButton>
