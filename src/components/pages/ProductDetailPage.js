@@ -63,6 +63,15 @@ const DetailsColumn = styled.div`
   flex-direction: column;
   gap: 1.5rem;
   padding-top: 2rem;
+
+  @media (max-width: 850px) {
+    padding-top: 1rem;
+  }
+
+  @media (max-width: 600px) {
+    gap: 1.2rem;
+    padding-top: 0;
+  }
 `;
 
 const CarouselWrapper = styled.div`
@@ -113,9 +122,9 @@ const SwiperDotStyle = createGlobalStyle`
 `;
 
 const ProductName = styled.h2`
-  font-size: 2.5rem;
+  font-size: clamp(1.8rem, 5vw, 2.5rem);
   font-weight: 800;
-  margin: 0;
+  margin: 0 0 1rem 0;
   color: #fff;
   letter-spacing: 0.5px;
   line-height: 1.2;
@@ -123,32 +132,58 @@ const ProductName = styled.h2`
 
 const InfoTags = styled.div`
   display: flex;
-  gap: 0.8rem;
+  gap: 0.75rem;
   flex-wrap: wrap;
+  align-items: center;
+  margin: 1.5rem 0;
 `;
 
 const Pill = styled.div`
   background: linear-gradient(135deg, #60519b, #8e7ce8);
   color: #fff;
-  border-radius: 999px;
-  padding: 0.35rem 0.95rem;
-  font-size: 0.75rem;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-size: 0.825rem;
   font-weight: 600;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(96, 81, 155, 0.4);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+
+  @media (max-width: 600px) {
+    padding: 0.45rem 0.85rem;
+    font-size: 0.75rem;
+  }
 `;
 
 const Price = styled.div`
-  color: #5ebdd5ff;
-  font-size: 2.2rem;
+  color: #5ebdd5;
+  font-size: clamp(1.8rem, 4vw, 2.2rem);
   font-weight: 800;
-  margin: 0;
+  margin: 0 0 1rem 0;
+  letter-spacing: 0.3px;
 `;
 
 const DescriptionText = styled.p`
-  font-size: 1.05rem;
-  line-height: 1.7;
+  font-size: 1rem;
+  line-height: 1.8;
   color: #cbd5e1;
-  margin: 0 0 1rem 0;
+  margin: 0 0 1.5rem 0;
+  letter-spacing: 0.2px;
+
+  @media (max-width: 600px) {
+    font-size: 0.95rem;
+    line-height: 1.7;
+  }
 `;
 
 const ZoomOverlay = styled(motion.div)`
@@ -282,11 +317,11 @@ const ProductDetailsPage = () => {
           <ProductName>{product.name}</ProductName>
           <Price>₹{product.price}</Price>
           <InfoTags>
-            <Pill>Size • {product.size}</Pill>
-            <Pill>Brand • {product.brand || 'Astrawear'}</Pill>
-            <Pill>Category • {product.category || 'Streetwear'}</Pill>
-            <Pill style={{ background: product.stock > 0 ? '#16a34a' : '#ef4444' }}>
-              {product.stock > 0 ? `In Stock (${product.stock})` : 'Sold Out'}
+            <Pill>📏 Size • {product.size}</Pill>
+            <Pill>🏷️ {product.brand || 'Astrawear'}</Pill>
+            <Pill>👕 {product.category || 'Streetwear'}</Pill>
+            <Pill style={{ background: product.stock > 0 ? 'linear-gradient(135deg, #059669, #10b981)' : 'linear-gradient(135deg, #dc2626, #ef4444)', borderColor: 'rgba(255,255,255, 0.15)' }}>
+              {product.stock > 0 ? `✓ Stock (${product.stock})` : '✕ Sold Out'}
             </Pill>
           </InfoTags>
           <DescriptionText>

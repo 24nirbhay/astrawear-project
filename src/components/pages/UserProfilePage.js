@@ -228,11 +228,17 @@ const UserProfilePage = () => {
 
       const { data } = supabase.storage.from('avatars').getPublicUrl(fileName);
 
-      // Use UPDATE instead of UPSERT to prevent wiping other profile fields
+      // Use UPSERT with all fields to prevent NOT NULL constraints and fix missing profiles
+      const fallbackUsername = user?.email?.split('@')[0] || `user${Math.floor(Math.random() * 1000)}`;
       const { error: updateError } = await supabase
         .from('profiles')
-        .update({ avatar_url: data.publicUrl })
-        .eq('id', user.id);
+        .upsert({ 
+          id: user.id,
+          avatar_url: data.publicUrl,
+          username: profile.username || fallbackUsername,
+          full_name: profile.full_name || null,
+          phone: profile.phone || null
+        });
 
       if (updateError) {
         throw new Error(updateError.message || 'Database update failed');
@@ -250,12 +256,15 @@ const UserProfilePage = () => {
 
   const handleSave = async () => {
     try {
-      // Use UPDATE instead of UPSERT to prevent wiping other profile fields
-      const { error } = await supabase.from('profiles').update({ 
+      // Use UPSERT to support older users whose profiles might not exist yet
+      const fallbackUsername = user?.email?.split('@')[0] || `user${Math.floor(Math.random() * 1000)}`;
+      const { error } = await supabase.from('profiles').upsert({ 
+        id: user.id,
         full_name: form.full_name,
         phone: form.phone,
-        username: form.username,
-      }).eq('id', user.id);
+        username: form.username || fallbackUsername,
+        avatar_url: profile.avatar_url || null
+      });
       
       if (error) throw new Error(error.message);
       

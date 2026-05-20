@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { FaSignInAlt, FaSignOutAlt } from 'react-icons/fa';
+import { FaSignInAlt, FaSignOutAlt, FaShoppingBag, FaTachometerAlt, FaInfoCircle } from 'react-icons/fa';
 import { useAuth } from '../../hooks/useAuth';
 
 const NavContainer = styled.nav`
@@ -61,18 +61,32 @@ const NavList = styled.ul`
 const NavItem = styled(motion.li)`
   margin: 1.5rem 0;
   a, button {
-    font-size: 2rem;
+    font-size: 1.5rem;
     color: white;
     text-decoration: none;
     font-weight: 500;
     display: flex;
     align-items: center;
-    gap: 10px;
+    justify-content: center;
+    gap: 15px;
     background: none;
     border: none;
     cursor: pointer;
+    padding: 8px 16px;
+    border-radius: 8px;
+    transition: all 0.2s;
+    
+    svg {
+      width: 24px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+    
     &:hover {
-      text-decoration: underline;
+      color: #a78bfa;
+      text-decoration: none;
+      background: rgba(96, 81, 155, 0.1);
+      transform: translateX(8px);
     }
   }
 `;
@@ -105,24 +119,14 @@ const Navbar = () => {
           <span></span>
         </MenuIcon>
       </NavContainer>
-      <AnimatePresence>
-        {isOpen && (
-          <Overlay
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <NavList
-              variants={listVariants}
-              initial="hidden"
-              animate="visible"
-            >
-              <NavItem variants={itemVariants} onClick={() => setIsOpen(false)}>
-                <Link to="/collections">Collections</Link>
+                  <FaShoppingBag /> Collections
+                </Link>
               </NavItem>
               {isAdmin && (
                 <NavItem variants={itemVariants} onClick={() => setIsOpen(false)}>
-                  <Link to="/admin">Admin</Link>
+                  <Link to="/admin">
+                    <FaTachometerAlt /> Admin
+                  </Link>
                 </NavItem>
               )}
             {loading ? (
@@ -130,9 +134,27 @@ const Navbar = () => {
             ) : user ? (
                 <>
                   <NavItem variants={itemVariants} onClick={() => setIsOpen(false)}>
-                    <Link to="/profile">User Profile</Link>
+                    <Link to="/profile">
+                      👤 Profile
+                    </Link>
                   </NavItem>
                   <NavItem variants={itemVariants}>
+                    <button onClick={handleLogout}>
+                      <FaSignOutAlt /> Logout
+                    </button>
+                  </NavItem>
+                </>
+              ) : (
+                <NavItem variants={itemVariants} onClick={() => setIsOpen(false)}>
+                  <Link to="/auth">
+                    <FaSignInAlt /> Login
+                  </Link>
+                </NavItem>
+              )}
+              <NavItem variants={itemVariants} onClick={() => setIsOpen(false)}>
+                <Link to="/about">
+                  <FaInfoCircle /> About
+                emVariants}>
                     <button onClick={handleLogout}>
                       <FaSignOutAlt /> Logout
                     </button>

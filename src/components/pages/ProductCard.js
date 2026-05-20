@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { SkeletonImage } from './SkeletonLoader';
 
 const Card = styled(motion.div)`
   position: relative; overflow: hidden; border-radius: 16px; background-color: #1a1a1a;
@@ -21,9 +22,19 @@ const SoldOutOverlay = styled.div`
   font-weight: 900; letter-spacing: 2px; z-index: 3; pointer-events: none; text-shadow: 1px 1px 8px #000;
 `;
 
+const ImageContainer = styled.div`
+  position: relative;
+  width: 100%;
+  height: 240px;
+  background-color: #0f172a;
+  overflow: hidden;
+  border-radius: 8px 8px 0 0;
+`;
+
 const ProductImage = styled.img`
-  width: 100%; height: 240px; object-fit: cover; display: block; border-radius: 8px 8px 0 0;
-  margin-bottom: 0.5rem; transition: transform 0.3s ease-in-out;
+  width: 100%; height: 100%; object-fit: cover; display: block; 
+  transition: transform 0.3s ease-in-out, opacity 0.3s ease;
+  opacity: ${props => props.loaded ? 1 : 0};
 `;
 
 const ProductInfo = styled.div`
@@ -45,6 +56,8 @@ const NewBadge = styled.span`
 `;
 
 const ProductCard = ({ product }) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+  
   // Fix: Map to Supabase "images" array or default to placeholder
   const imagesArray = product.images || product.image || ['/favicon.png'];
   const imageUrl = Array.isArray(imagesArray) ? imagesArray[0] : imagesArray;
@@ -59,7 +72,16 @@ const ProductCard = ({ product }) => {
       soldout={isSoldOut ? 1 : 0}
     >
       <Link to={`/product/${product.id}`}>
-        <ProductImage src={imageUrl} alt={product.name} />
+        <ImageContainer>
+          {!imageLoaded && <SkeletonImage />}
+          <ProductImage 
+            src={imageUrl} 
+            alt={product.name}
+            loaded={imageLoaded}
+            onLoad={() => setImageLoaded(true)}
+            onError={() => setImageLoaded(true)}
+          />
+        </ImageContainer>
         {isSoldOut && <SoldOutOverlay>Sold Out</SoldOutOverlay>}
         {!isSoldOut && <NewBadge>NEW</NewBadge>}
         <ProductInfo>
